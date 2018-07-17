@@ -55,16 +55,18 @@ class Board extends React.Component<IBoardProps, {}> {
 interface IHistoryItemProps {
     stepNumber: number;
     desc: string;
+    isSelected: boolean;
     onClick(stepNumber: number): void;
 }
 
 function HistoryItem(props: IHistoryItemProps) {
+    const desc = props.isSelected ? <b>{props.desc}</b> : props.desc;
     return (
         <li>
             <button
                 onClick={props.onClick.bind(null, props.stepNumber)}
             >
-                {props.desc}
+                {desc}
             </button>
         </li>
     );
@@ -106,6 +108,7 @@ class Game extends React.Component<{}, IGameState> {
                     key={move}
                     stepNumber={move}
                     desc={desc}
+                    isSelected={this.state.stepNumber === move}
                     onClick={this.jumpTo}
                 />
             );
