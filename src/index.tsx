@@ -2,13 +2,32 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
 
-class Square extends React.Component {
+interface ISquareState { value: string; };
+
+class Square extends React.Component<{}, ISquareState> {
+    constructor(props: any) {
+        super(props);
+
+        this.state = {
+            value: '',
+        };
+
+        this.handleClick = this.handleClick.bind(this);
+    }
+
     public render() {
         return (
-            <button className="square">
-                {/* TODO */}
+            <button
+                className="square"
+                onClick={this.handleClick}
+            >
+                {this.state.value}
             </button>
         );
+    }
+
+    private handleClick() {
+        this.setState({ value: 'X' });
     }
 }
 
