@@ -4,26 +4,15 @@ import './index.css';
 
 interface ISquareProps { id: number; value: string; onClick(id: number): void };
 
-class Square extends React.Component<ISquareProps, {}> {
-    constructor(props: any) {
-        super(props);
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    public render() {
-        return (
-            <button
-                className="square"
-                onClick={this.handleClick}
-            >
-                {this.props.value}
-            </button>
-        );
-    }
-
-    private handleClick() {
-        this.props.onClick(this.props.id);
-    }
+function Square(props: ISquareProps) {
+    return (
+        <button
+            className="square"
+            onClick={props.onClick.bind(null, props.id)}
+        >
+            {props.value}
+        </button>
+    );
 }
 
 interface IBoardState { squares: string[]; }
