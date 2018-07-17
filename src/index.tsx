@@ -72,7 +72,7 @@ function HistoryItem(props: IHistoryItemProps) {
     );
 }
 
-interface IBoardState { squares: string[]; }
+interface IBoardState { squares: string[]; selectedSquare?: number; }
 
 interface IGameState {
     history: IBoardState[];
@@ -101,8 +101,15 @@ class Game extends React.Component<{}, IGameState> {
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
 
-        const moves = history.map((_step, move) => {
-            const desc = move ? ('Go to move #' + move) : 'Go to game start';
+        const moves = history.map((step, move) => {
+            let desc;
+            if (move === 0) {
+                desc = 'Go to game start';
+            } else {
+                const [row, col] = calculateRowCol(step.selectedSquare!);
+                desc = `Go to move #${move} (${col}, ${row})`;
+            }
+
             return (
                 <HistoryItem
                     key={move}
@@ -148,6 +155,7 @@ class Game extends React.Component<{}, IGameState> {
         squares[squareId] = this.state.xIsNext ? 'X' : 'O';
         this.setState({
             history: history.concat([{
+                selectedSquare: squareId,
                 squares,
             }]),
             stepNumber: history.length,
@@ -191,3 +199,8 @@ function calculateWinner(squares: string[]): string | undefined {
     return undefined;
 }
 
+function calculateRowCol(squareId: number): [number, number] {
+    const row = Math.floor(squareId / 3) + 1;
+    const col = (squareId % 3) + 1;
+    return [row, col];
+}
