@@ -2,16 +2,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
 
-interface ISquareState { value: string; };
+interface ISquareProps { id: number; value: string; onClick(id: number): void };
 
-class Square extends React.Component<{}, ISquareState> {
+class Square extends React.Component<ISquareProps, {}> {
     constructor(props: any) {
         super(props);
-
-        this.state = {
-            value: '',
-        };
-
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -21,18 +16,29 @@ class Square extends React.Component<{}, ISquareState> {
                 className="square"
                 onClick={this.handleClick}
             >
-                {this.state.value}
+                {this.props.value}
             </button>
         );
     }
 
     private handleClick() {
-        this.setState({ value: 'X' });
+        this.props.onClick(this.props.id);
     }
 }
 
+interface IBoardState { squares: string[]; }
+
 // tslint:disable-next-line:max-classes-per-file
-class Board extends React.Component {
+class Board extends React.Component<{}, IBoardState> {
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            squares: Array(9).fill(null),
+        };
+
+        this.handleSquareClick = this.handleSquareClick.bind(this);
+    }
+
     public render() {
         const status = 'Next player: X';
 
@@ -58,8 +64,20 @@ class Board extends React.Component {
         );
     }
 
-    private renderSquare(i: number) {
-        return <Square />;
+    private renderSquare(id: number) {
+        return (
+            <Square
+                id={id}
+                value={this.state.squares[id]}
+                onClick={this.handleSquareClick}
+            />
+        );
+    }
+
+    private handleSquareClick(i: number) {
+        const squares = this.state.squares.slice();
+        squares[i] = 'X';
+        this.setState({ squares });
     }
 }
 
