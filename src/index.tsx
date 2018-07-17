@@ -15,7 +15,7 @@ function Square(props: ISquareProps) {
     );
 }
 
-interface IBoardState { squares: string[]; }
+interface IBoardState { squares: string[]; xIsNext: boolean; }
 
 // tslint:disable-next-line:max-classes-per-file
 class Board extends React.Component<{}, IBoardState> {
@@ -23,13 +23,20 @@ class Board extends React.Component<{}, IBoardState> {
         super(props);
         this.state = {
             squares: Array(9).fill(null),
+            xIsNext: true,
         };
 
         this.handleSquareClick = this.handleSquareClick.bind(this);
     }
 
     public render() {
-        const status = 'Next player: X';
+        const winner = calculateWinner(this.state.squares);
+        let status;
+        if (winner) {
+            status = 'Winner: ' + winner;
+        } else {
+            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+        }
 
         return (
             <div>
@@ -65,8 +72,12 @@ class Board extends React.Component<{}, IBoardState> {
 
     private handleSquareClick(i: number) {
         const squares = this.state.squares.slice();
-        squares[i] = 'X';
-        this.setState({ squares });
+        if (calculateWinner(squares) || squares[i]) {
+            return;
+        }
+
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        this.setState({ squares, xIsNext: !this.state.xIsNext });
     }
 }
 
@@ -93,3 +104,25 @@ ReactDOM.render(
     <Game />,
     document.getElementById('root')
 );
+
+function calculateWinner(squares: string[]): string | undefined {
+    const lines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+
+    for (const [a, b, c] of lines) {
+        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            return squares[a];
+        }
+    }
+
+    return undefined;
+}
+
