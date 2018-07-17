@@ -20,30 +20,23 @@ interface IBoardProps { squares: string[]; onClick(id: number): void; }
 // tslint:disable-next-line:max-classes-per-file
 class Board extends React.Component<IBoardProps, {}> {
     public render() {
-        return (
-            <div>
-                <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
-                </div>
-            </div>
-        );
+        const rows = new Array();
+        for (let i = 0; i < 3; i++) {
+            const row = new Array();
+            for (let j = 0; j < 3; j++) {
+                row.push(this.renderSquare(i * 3 + j));
+            }
+
+            rows.push(<div key={i} className="board-row">{row}</div>);
+        }
+
+        return <div>{rows}</div>;
     }
 
     private renderSquare(id: number) {
         return (
             <Square
+                key={id}
                 id={id}
                 value={this.props.squares[id]}
                 onClick={this.props.onClick.bind(null, id)}
