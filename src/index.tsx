@@ -52,9 +52,31 @@ class Board extends React.Component<IBoardProps, {}> {
     }
 }
 
+interface IHistoryItemProps {
+    stepNumber: number;
+    desc: string;
+    onClick(stepNumber: number): void;
+}
+
+function HistoryItem(props: IHistoryItemProps) {
+    return (
+        <li>
+            <button
+                onClick={props.onClick.bind(null, props.stepNumber)}
+            >
+                {props.desc}
+            </button>
+        </li>
+    );
+}
+
 interface IBoardState { squares: string[]; }
 
-interface IGameState { history: IBoardState[], xIsNext: boolean; }
+interface IGameState {
+    history: IBoardState[];
+    stepNumber: number;
+    xIsNext: boolean;
+}
 
 // tslint:disable-next-line:max-classes-per-file
 class Game extends React.Component<{}, IGameState> {
@@ -64,16 +86,30 @@ class Game extends React.Component<{}, IGameState> {
             history: [{
                 squares: Array(9).fill(null),
             }],
+            stepNumber: 0,
             xIsNext: true,
         }
 
         this.handleClick = this.handleClick.bind(this);
+        this.jumpTo = this.jumpTo.bind(this);
     }
 
     public render() {
         const history = this.state.history;
-        const current = history[history.length - 1];
+        const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
+
+        const moves = history.map((step, move) => {
+            const desc = move ? ('Go to move #' + move) : 'Go to game start';
+            return (
+                <HistoryItem
+                    key={move}
+                    stepNumber={move}
+                    desc={desc}
+                    onClick={this.jumpTo}
+                />
+            );
+        })
 
         let status;
         if (winner) {
@@ -92,14 +128,14 @@ class Game extends React.Component<{}, IGameState> {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    <ol>{/* TODO */}</ol>
+                    <ol>{moves}</ol>
                 </div>
             </div>
         );
     }
 
     private handleClick(squareId: number) {
-        const history = this.state.history;
+        const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
         if (calculateWinner(squares) || squares[squareId]) {
@@ -111,7 +147,15 @@ class Game extends React.Component<{}, IGameState> {
             history: history.concat([{
                 squares,
             }]),
+            stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
+        });
+    }
+
+    private jumpTo(stepNumber: number) {
+        this.setState({
+            stepNumber,
+            xIsNext: (stepNumber % 2) === 0,
         });
     }
 }
